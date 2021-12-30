@@ -12,15 +12,15 @@ public struct BuildPhaseKit {
         URL(fileURLWithPath: Self.bootStrapPath)
     }
     
-    static var packages: [PackageModel] {
-        get {
-            
-        }
-        
-        set {
-            
-        }
-    }
+//    static var packages: [PackageModel] {
+//        get {
+//
+//        }
+//
+//        set {
+//
+//        }
+//    }
     
     public private(set) var text = "Hello, World!"
 
@@ -51,7 +51,7 @@ public struct BuildPhaseKit {
             executionError = error
         }
         
-        guard let executionError = executionError else {
+        if let executionError = executionError {
             throw executionError
         }
         
