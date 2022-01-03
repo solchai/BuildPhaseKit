@@ -12,16 +12,6 @@ public struct BuildPhaseKit {
         URL(fileURLWithPath: Self.bootStrapPath)
     }
     
-//    static var packages: [PackageModel] {
-//        get {
-//
-//        }
-//
-//        set {
-//
-//        }
-//    }
-    
     public private(set) var text = "Hello, World!"
 
     public init() {
@@ -45,7 +35,42 @@ public struct BuildPhaseKit {
         
         var executionError: Error?
         
-        task.execute(withArguments: ["touch", "Placeholder.swift"]) { error in
+        task.execute(withArguments: ["touch", "Empty.swift"]) { error in
+            semaphore.signal()
+            
+            executionError = error
+        }
+        
+        if let executionError = executionError {
+            throw executionError
+        }
+        
+        let timeOut = semaphore.wait(timeout: .now() + .seconds(2))
+        if timeOut == .timedOut {
+            throw FileCreationError.timedOut
+        }
+    }
+    
+    private func createPackageManifest() throws {
+        guard let task = try? NSUserUnixTask(url: Self.bootStrapURL) else {
+            throw FileCreationError.taskNotCreated
+        }
+        
+        let manifestLocation = Self.bootStrapURL.appendingPathComponent("Package").appendingPathExtension("swift")
+        
+        if FileManager.default.fileExists(atPath: manifestLocation.path) {
+            do {
+                try FileManager.default.removeItem(at: manifestLocation)
+            } catch {
+                throw error
+            }
+        }
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        var executionError: Error?
+        
+        task.execute(withArguments: ["touch", "Package.swift"]) { error in
             semaphore.signal()
             
             executionError = error

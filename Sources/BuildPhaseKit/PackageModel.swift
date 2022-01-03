@@ -8,5 +8,5 @@
 import Foundation
 
 struct PackageModel {
-    let sourceURL: String
+    let package: String
 }
