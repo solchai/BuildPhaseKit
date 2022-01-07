@@ -5,6 +5,7 @@
 //  Created by Solomon Chai on 2021-12-30.
 //
 
+import Foundation
 import PackageModel
 import PackageLoading
 import PackageGraph
@@ -23,69 +24,83 @@ class PackageManager {
         return AbsolutePath(string)
     }()
     
-    let package = AbsolutePath(".../swift-package-manager")
-    let diagnostics = DiagnosticsEngine()
-    
-    func loadPackages() throws {
-        do {
-            let manifest = try ManifestLoader.loadManifest(packagePath: package, swiftCompiler: swiftCompiler, packageKind: .local)
-            let loadedPackage = try PackageBuilder.loadPackage(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
-            let graph = try Workspace.loadGraph(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
-            
-            // Manifest
-            let products = manifest.products.map({ $0.name }).joined(separator: ", ")
-            print("Products:", products)
-            let targets = manifest.targets.map({ $0.name }).joined(separator: ", ")
-            print("Targets:", targets)
-            
-            // Package
-            let executables = loadedPackage.targets.filter({ $0.type == .executable }).map({ $0.name })
-            print("Executable targets:", executables)
-            
-            // PackageGraph
-            let numberOfFiles = graph.reachableTargets.reduce(0, { $0 + $1.sources.paths.count })
-            print("Total number of source files (including dependencies):", numberOfFiles)
-        }
-        catch {
-            print(error)
-        }
-    }
-    
-    func loadPackages(_ models: [PackageModel]) {
-        for package in models.map({ $0.package }) {
-            let relativePath = AbsolutePath(BuildPhaseKit.bootStrapURL.appendingPathComponent(package).path)
-            let manifestLoader = ManifestLoader(toolchain: ToolchainConfiguration(swiftCompilerPath: swiftCompilerPath))
-            
-            do {
-                var manifest: Manifest?
-                
-                manifestLoader.load(at: relativePath, packageIdentity: <#T##PackageIdentity#>, packageKind: <#T##PackageReference.Kind#>, packageLocation: <#T##String#>, version: <#T##Version?#>, revision: <#T##String?#>, toolsVersion: <#T##ToolsVersion#>, identityResolver: <#T##IdentityResolver#>, fileSystem: <#T##FileSystem#>, observabilityScope: <#T##ObservabilityScope#>, on: <#T##DispatchQueue#>, completion: <#T##(Result<Manifest, Error>) -> Void#>)
-                
-                = manifestLoader.load(at: <#T##AbsolutePath#>, packageIdentity: <#T##PackageIdentity#>, packageKind: <#T##PackageReference.Kind#>, packageLocation: <#T##String#>, version: <#T##Version?#>, revision: <#T##String?#>, toolsVersion: <#T##ToolsVersion#>, identityResolver: <#T##IdentityResolver#>, fileSystem: <#T##FileSystem#>, observabilityScope: <#T##ObservabilityScope#>, on: <#T##DispatchQueue#>, completion: <#T##(Result<Manifest, Error>) -> Void#>)
-                
-                let manifest = try ManifestLoader.loadManifest(packagePath: package, swiftCompiler: swiftCompiler, packageKind: .local)
-                let loadedPackage = try PackageBuilder.loadPackage(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
-                let graph = try Workspace.loadGraph(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
-                
-                // Manifest
-                let products = manifest.products.map({ $0.name }).joined(separator: ", ")
-                print("Products:", products)
-                let targets = manifest.targets.map({ $0.name }).joined(separator: ", ")
-                print("Targets:", targets)
-                
-                // Package
-                let executables = loadedPackage.targets.filter({ $0.type == .executable }).map({ $0.name })
-                print("Executable targets:", executables)
-                
-                // PackageGraph
-                let numberOfFiles = graph.reachableTargets.reduce(0, { $0 + $1.sources.paths.count })
-                print("Total number of source files (including dependencies):", numberOfFiles)
-            }
-            catch {
-                throw error
-            }
-        }
-    }
+//    let package = AbsolutePath(".../swift-package-manager")
+//    let diagnostics = DiagnosticsEngine()
+//
+//    func loadPackages() throws {
+//        do {
+//            let manifest = try ManifestLoader.loadManifest(packagePath: package, swiftCompiler: swiftCompiler, packageKind: .local)
+//            let loadedPackage = try PackageBuilder.loadPackage(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
+//            let graph = try Workspace.loadGraph(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
+//
+//            // Manifest
+//            let products = manifest.products.map({ $0.name }).joined(separator: ", ")
+//            print("Products:", products)
+//            let targets = manifest.targets.map({ $0.name }).joined(separator: ", ")
+//            print("Targets:", targets)
+//
+//            // Package
+//            let executables = loadedPackage.targets.filter({ $0.type == .executable }).map({ $0.name })
+//            print("Executable targets:", executables)
+//
+//            // PackageGraph
+//            let numberOfFiles = graph.reachableTargets.reduce(0, { $0 + $1.sources.paths.count })
+//            print("Total number of source files (including dependencies):", numberOfFiles)
+//        }
+//        catch {
+//            print(error)
+//        }
+//    }
+//
+//    func loadPackages(_ models: [PackageModel]) {
+//        for package in models.map({ $0.package }) {
+//            let relativePath = AbsolutePath(BuildPhaseKit.bootStrapURL.appendingPathComponent(package).path)
+//            let manifestLoader = ManifestLoader(toolchain: ToolchainConfiguration(swiftCompilerPath: swiftCompilerPath))
+//
+//            do {
+//                var manifest: Manifest?
+//
+//                manifestLoader.load(at: relativePath, packageIdentity: <#T##PackageIdentity#>, packageKind: .local, packageLocation: <#T##String#>, version: <#T##Version?#>, revision: <#T##String?#>, toolsVersion: <#T##ToolsVersion#>, identityResolver: <#T##IdentityResolver#>, fileSystem: <#T##FileSystem#>, observabilityScope: <#T##ObservabilityScope#>, on: <#T##DispatchQueue#>, completion: <#T##(Result<Manifest, Error>) -> Void#>)
+//
+//                let manifest = try ManifestLoader.loadManifest(packagePath: package, swiftCompiler: swiftCompiler, packageKind: .local)
+//                let loadedPackage = try PackageBuilder.loadPackage(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
+//                let graph = try Workspace.loadGraph(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
+//
+//                // Manifest
+//                let products = manifest.products.map({ $0.name }).joined(separator: ", ")
+//                print("Products:", products)
+//                let targets = manifest.targets.map({ $0.name }).joined(separator: ", ")
+//                print("Targets:", targets)
+//
+//                // Package
+//                let executables = loadedPackage.targets.filter({ $0.type == .executable }).map({ $0.name })
+//                print("Executable targets:", executables)
+//
+//                // PackageGraph
+//                let numberOfFiles = graph.reachableTargets.reduce(0, { $0 + $1.sources.paths.count })
+//                print("Total number of source files (including dependencies):", numberOfFiles)
+//            }
+//            catch {
+//                throw error
+//            }
+//        }
+//    }
 
-    func 
+    func loadPackages(at url: URL) {
+        var packageManifest = """
+// swift-tools-version:5.1
+import PackageDescription
+
+let package = Package(
+    name: "BuildTools",
+    platforms: [.macOS(.v10_11)],
+    dependencies: [
+        %@
+    ],
+    targets: [.target(name: "BuildTools", path: "")]
+)
+"""
+        
+        
+    }
 }

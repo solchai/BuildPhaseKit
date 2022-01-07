@@ -7,6 +7,24 @@
 
 import Foundation
 
-struct PackageModel {
-    let package: String
+public struct PackageModel {
+    let soruceURL: String
+    let config: Configuration
+}
+
+public enum Configuration: Identifiable {
+    public var id: String {
+        switch self {
+        case .version:
+            return "version"
+        case .branch:
+            return "branch"
+        default:
+            return "other"
+        }
+    }
+    
+    case version
+    case branch
+    case none
 }

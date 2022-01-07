@@ -1,33 +1,32 @@
-import AppKit
+import Foundation
 
 public struct BuildPhaseKit {
-    static var bootStrapPath: String {
+    var bootStrapPath: String {
         let fileManager = FileManager.default
         
         let currentPath = fileManager.currentDirectoryPath
         return currentPath.appending("BuildTools")
     }
     
-    static var bootStrapURL: URL {
-        URL(fileURLWithPath: Self.bootStrapPath)
+    var bootStrapURL: URL {
+        URL(fileURLWithPath: bootStrapPath)
     }
     
-    public private(set) var text = "Hello, World!"
-
     public init() {
+        loadPackages()
+    }
+    
+    private func loadPackages() {
         let fileManager = FileManager.default
         
-        if !fileManager.fileExists(atPath: Self.bootStrapPath) {
-            do {
-                try fileManager.createDirectory(at: Self.bootStrapURL, withIntermediateDirectories: true, attributes: nil)
-            } catch let error {
-                fatalError(error.localizedDescription)
-            }
+        if !fileManager.fileExists(atPath: bootStrapPath) {
+            try! fileManager.createDirectory(at: bootStrapURL, withIntermediateDirectories: true, attributes: nil)
+            try! createPackageManifest()
         }
     }
     
     private func createEmptySwiftFile() throws {
-        guard let task = try? NSUserUnixTask(url: Self.bootStrapURL) else {
+        guard let task = try? NSUserUnixTask(url: bootStrapURL) else {
             throw FileCreationError.taskNotCreated
         }
         
@@ -52,11 +51,11 @@ public struct BuildPhaseKit {
     }
     
     private func createPackageManifest() throws {
-        guard let task = try? NSUserUnixTask(url: Self.bootStrapURL) else {
+        guard let task = try? NSUserUnixTask(url: bootStrapURL) else {
             throw FileCreationError.taskNotCreated
         }
         
-        let manifestLocation = Self.bootStrapURL.appendingPathComponent("Package").appendingPathExtension("swift")
+        let manifestLocation = bootStrapURL.appendingPathComponent("Package").appendingPathExtension("swift")
         
         if FileManager.default.fileExists(atPath: manifestLocation.path) {
             do {
