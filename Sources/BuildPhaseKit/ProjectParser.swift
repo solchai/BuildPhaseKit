@@ -33,14 +33,79 @@ class ProjectParser {
             }
         }
         
-        identifyPackages(projectString, &packages)
+        do {
+            try identifyPackages(projectString, &packages)
+        } catch {
+            return packages
+        }
+        
         
         
 
         return packages
     }
     
-    func identifyPackages(_ projectString: String, _ packages: inout [PackageModel]) {
+    func identifyPackages(_ projectString: String, _ packages: inout [PackageModel]) throws {
+        let urlRegex = NSRegularExpression("^repositoryURL\\s=\\s[A-Za-z,.'\"\\s]+[;]$")
+        let configRegex = NSRegularExpression("^requirement\\s=\\s{[A-Za-z,.'\"\\s]+};")
+        
+        guard let range = NSRange(projectString) else {
+            throw PackageParsingError.invalidRange
+        }
+        
+        let repositoryURL =  urlRegex.matches(in: projectString, options: [], range: range).map { result -> String in
+            guard let urlRange = result.range.stringRange(projectString) else {
+                return ""
+            }
+            
+            return String(projectString[urlRange])
+        }
+        let configurations = configRegex.matches(in: projectString, options: [], range: range).map { result -> String in
+            guard let configRange = result.range.stringRange(projectString) else {
+                return ""
+            }
+            return String(projectString[configRange])
+        }
+        
         
     }
+    
+    private func determineConfiguration(_ config: String) throws -> (Configuration, String) {
+        let kindRegex = NSRegularExpression("^kind\\s=\\s[A-Za-z,.'\"\\s]+[;]$")
+        
+        guard let range = NSRange(config) else {
+            throw PackageParsingError.invalidRange
+        }
+        
+        guard let configRange = kindRegex.matches(in: config, options: [], range: range).first?.range.stringRange(config) else {
+            return (Configuration.none, "")
+        }
+        
+        var rawValue = String(config[configRange])
+        rawValue = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 7)...rawValue.index(rawValue.endIndex, offsetBy: 1)])
+        
+        guard let configuration = Configuration(rawValue: rawValue) else {
+            return (Configuration.none, "")
+        }
+        
+        // TODO: Add logic for determining version specification mothod
+    }
+    
+    private enum PackageParsingError: Error {
+        case invalidRange
+    }
 }
+
+
+///Examples
+//    repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+//    requirement = {
+//        branch = master;
+//        kind = branch;
+//    };
+
+//    repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+//    requirement = {
+//        kind = upToNextMajorVersion;
+//        minimumVersion = 5.15.8;
+//    };
