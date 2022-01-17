@@ -89,6 +89,22 @@ class ProjectParser {
         }
         
         // TODO: Add logic for determining version specification mothod
+        switch configuration {
+        case .nextMinorVersion:
+            
+        case .exactVersion:
+            <#code#>
+        case .versionRange:
+            <#code#>
+        case .nextMajorversion:
+            <#code#>
+        case .branch:
+            <#code#>
+        case .revision:
+            <#code#>
+        case .none:
+            <#code#>
+        }
     }
     
     private enum PackageParsingError: Error {
@@ -97,15 +113,46 @@ class ProjectParser {
 }
 
 
-///Examples
+//    isa = XCRemoteSwiftPackageReference;
+//    repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+//    requirement = {
+//        kind = upToNextMinorVersion;
+//        minimumVersion = 5.5.0;
+//    };
+
+//    isa = XCRemoteSwiftPackageReference;
+//    repositoryURL = "https://github.com/SnapKit/SnapKit";
+//    requirement = {
+//        kind = versionRange;
+//        maximumVersion = 6.0.0;
+//        minimumVersion = 5.0.0;
+//    };
+
+//    isa = XCRemoteSwiftPackageReference;
+//    repositoryURL = "https://github.com/realm/SwiftLint.git";
+//    requirement = {
+//        kind = exactVersion;
+//        version = 0.9.2;
+//    };
+
+//    isa = XCRemoteSwiftPackageReference;
+//    repositoryURL = "https://github.com/realm/realm-swift.git";
+//    requirement = {
+//        kind = revision;
+//        revision = c989dbb92b3cf59b4f1ec1536b9dc090878ce4eb;
+//    };
+
+//    isa = XCRemoteSwiftPackageReference;
 //    repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
 //    requirement = {
 //        branch = master;
 //        kind = branch;
 //    };
 
+//    isa = XCRemoteSwiftPackageReference;
 //    repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 //    requirement = {
 //        kind = upToNextMajorVersion;
 //        minimumVersion = 5.15.8;
 //    };
+

@@ -17,13 +17,15 @@ public enum Configuration: String, Identifiable {
     public var id: String {
         switch self {
         case .exactVersion:
-            return "exact"
+            return "exactVersion"
         case .versionRange:
-            return "versinRange"
+            return "versionRange"
         case .nextMajorversion:
-            return "nextMajorVersion"
+            return "upToNextMajorVersion"
         case .nextMinorVersion:
-            return "nextMinorVersion"
+            return "upToNextMinorVersion"
+        case .revision:
+            return "revision"
         case .branch:
             return "branch"
         default:
@@ -36,5 +38,6 @@ public enum Configuration: String, Identifiable {
     case nextMajorversion
     case nextMinorVersion
     case branch
+    case revision
     case none
 }
