@@ -12,6 +12,11 @@ public struct BuildPhaseKit {
         URL(fileURLWithPath: bootStrapPath)
     }
     
+    var manifestLocation: URL {
+        bootStrapURL.appendingPathComponent("Package").appendingPathExtension("swift")
+        
+    }
+    
     public init() {
         loadPackages()
     }
@@ -21,6 +26,7 @@ public struct BuildPhaseKit {
         
         if !fileManager.fileExists(atPath: bootStrapPath) {
             try! fileManager.createDirectory(at: bootStrapURL, withIntermediateDirectories: true, attributes: nil)
+            try! createEmptySwiftFile()
             try! createPackageManifest()
         }
     }
@@ -55,8 +61,6 @@ public struct BuildPhaseKit {
             throw FileCreationError.taskNotCreated
         }
         
-        let manifestLocation = bootStrapURL.appendingPathComponent("Package").appendingPathExtension("swift")
-        
         if FileManager.default.fileExists(atPath: manifestLocation.path) {
             do {
                 try FileManager.default.removeItem(at: manifestLocation)
@@ -83,6 +87,10 @@ public struct BuildPhaseKit {
         if timeOut == .timedOut {
             throw FileCreationError.timedOut
         }
+    }
+    
+    private func loadPackageManifest() {
+        PackageManager.shared.loadPackages(at: manifestLocation)
     }
     
     private enum FileCreationError: Error {

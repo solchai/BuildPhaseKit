@@ -12,7 +12,17 @@ import PackageGraph
 import TSCBasic
 
 class PackageManager {
-    let shared = PackageManager()
+    static let shared = PackageManager()
+    
+    let parser: ProjectParser
+    
+    init(parser: ProjectParser) {
+        self.parser = parser
+    }
+    
+    convenience init() {
+        self.init(parser: ProjectParser.shared)
+    }
     
     let swiftCompilerPath: AbsolutePath = {
         let string: String
@@ -60,7 +70,7 @@ class PackageManager {
 //            do {
 //                var manifest: Manifest?
 //
-//                manifestLoader.load(at: relativePath, packageIdentity: <#T##PackageIdentity#>, packageKind: .local, packageLocation: <#T##String#>, version: <#T##Version?#>, revision: <#T##String?#>, toolsVersion: <#T##ToolsVersion#>, identityResolver: <#T##IdentityResolver#>, fileSystem: <#T##FileSystem#>, observabilityScope: <#T##ObservabilityScope#>, on: <#T##DispatchQueue#>, completion: <#T##(Result<Manifest, Error>) -> Void#>)
+//                manifestLoader.load(at: relativePath, packageIdentity: , packageKind: .local, packageLocation: , version: , revision: , toolsVersion: , identityResolver: , fileSystem: , observabilityScope: , on: , completion: )
 //
 //                let manifest = try ManifestLoader.loadManifest(packagePath: package, swiftCompiler: swiftCompiler, packageKind: .local)
 //                let loadedPackage = try PackageBuilder.loadPackage(packagePath: package, swiftCompiler: swiftCompiler, diagnostics: diagnostics)
@@ -101,6 +111,80 @@ let package = Package(
 )
 """
         
+        let packages = parser.parseProjectForPackages()
         
+        let packageDescriptions = packages.map({getPackageDesc($0)})
+        
+        var dependencies = ""
+        
+        for i in 0..<packageDescriptions.count {
+            guard let description = packageDescriptions[i] else {
+                continue
+            }
+            
+            dependencies += description
+            if i < packageDescriptions.count - 1 {
+                dependencies += ", "
+            }
+        }
+        
+        packageManifest = String(format: packageManifest, dependencies)
+        
+        do {
+            try packageManifest.write(to: url, atomically: true, encoding: String.Encoding.utf8)
+        } catch {
+            print(error.localizedDescription) // TODO: Handle error
+        }
+    }
+    
+    private func getPackageDesc(_ package: PackageModel) -> String? {
+        func requirement(_ config: Configuration, _ detail: Any?) -> String? {
+            switch config {
+            case .exactVersion:
+                guard let detail = detail as? String else {
+                    fallthrough
+                }
+                
+                return String(format: ".exact(%@)", detail)
+            case .versionRange:
+                guard let detail = detail as? Range<String> else {
+                    fallthrough
+                }
+                
+                return String(format: ".rangeItem(%@)", String(describing: detail))
+            case .nextMajorversion:
+                guard let detail = detail as? String else {
+                    fallthrough
+                }
+                
+                return String(format: ".upToNextMajor(%@)", detail)
+            case .nextMinorVersion:
+                guard let detail = detail as? String else {
+                    fallthrough
+                }
+                
+                return String(format: ".upToNextMinor(%@)", detail)
+            case .branch:
+                guard let detail = detail as? String else {
+                    fallthrough
+                }
+                
+                return String(format: ".branch(%@)", detail)
+            case .revision:
+                guard let detail = detail as? String else {
+                    fallthrough
+                }
+                
+                return String(format: ".branch(%@)", detail)
+            default:
+                return nil
+            }
+        }
+        
+        guard let requirement = requirement(package.config, package.detail) else {
+            return nil
+        }
+        
+        return String(format: ".package(url: %@, _ requirement: %@)", arguments: [package.soruceURL, requirement])
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 public struct PackageModel {
     let soruceURL: String
     let config: Configuration
-    let configDescriptin: String
+    var detail: Any?
 }
 
 public enum Configuration: String, Identifiable {
