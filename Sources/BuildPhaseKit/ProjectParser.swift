@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ProjectParser.swift
 //  
 //
 //  Created by Solomon Chai on 2022-01-02.
@@ -41,27 +41,6 @@ class ProjectParser {
     }
     
     private func identifyPackages(_ projectString: String, _ packages: inout [PackageModel]) {
-//        let urlRegex = NSRegularExpression("^repositoryURL\\s=\\s[A-Za-z,.'\"\\s]+[;]$")
-//        let configRegex = NSRegularExpression("^requirement\\s=\\s{[A-Za-z,.'\"\\s]+};")
-        
-//        guard let range = NSRange(projectString) else {
-//            throw PackageParsingError.invalidRange
-//        }
-//
-//        let repositoryURL =  urlRegex.matches(in: projectString, options: [], range: range).map { result -> String in
-//            guard let urlRange = result.range.stringRange(projectString) else {
-//                return ""
-//            }
-//
-//            return String(projectString[urlRange])
-//        }
-//        let configurations = configRegex.matches(in: projectString, options: [], range: range).map { result -> String in
-//            guard let configRange = result.range.stringRange(projectString) else {
-//                return ""
-//            }
-//            return String(projectString[configRange])
-//        }
-        
         guard let repoURL = projectString.slice(from: "repositoryURL = ", to: ";"), let requirementRange = projectString.sliceRange(from: "requirement = {", to: "};"), let requirement = String(projectString[requirementRange]) else {
             return
         }
@@ -108,89 +87,7 @@ class ProjectParser {
         identifyPackages(String(projectString[requirementRange.upperBound...]), &packages)
     }
     
-//    private func determineConfiguration(_ config: String) throws -> (Configuration, String) {
-//        let kindRegex = NSRegularExpression("^kind\\s=\\s[A-Za-z,.'\"\\s]+[;]$")
-//
-//        guard let range = NSRange(config) else {
-//            throw PackageParsingError.invalidRange
-//        }
-//
-//        guard let configRange = kindRegex.matches(in: config, options: [], range: range).first?.range.stringRange(config) else {
-//            return (Configuration.none, "")
-//        }
-//
-//        var rawValue = String(config[configRange])
-//        rawValue = String(rawValue[rawValue.index(rawValue.startIndex, offsetBy: 7)...rawValue.index(rawValue.endIndex, offsetBy: 1)])
-//
-//        guard let configuration = Configuration(rawValue: rawValue) else {
-//            return (Configuration.none, "")
-//        }
-//
-//        // TODO: Add logic for determining version specification mothod
-//        switch configuration {
-//        case .nextMinorVersion:
-//
-//        case .exactVersion:
-//            let  = NSRegularExpression("^kind\\s=\\s[A-Za-z,.'\"\\s]+[;]$")
-//        case .versionRange:
-//
-//        case .nextMajorversion:
-//
-//        case .branch:
-//
-//        case .revision:
-//
-//        case .none:
-//
-//        }
-//    }
-    
     private enum PackageParsingError: Error {
         case invalidRange
     }
 }
-
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-//    requirement = {
-//        kind = upToNextMinorVersion;
-//        minimumVersion = 5.5.0;
-//    };
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/SnapKit/SnapKit";
-//    requirement = {
-//        kind = versionRange;
-//        maximumVersion = 6.0.0;
-//        minimumVersion = 5.0.0;
-//    };
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/realm/SwiftLint.git";
-//    requirement = {
-//        kind = exactVersion;
-//        version = 0.9.2;
-//    };
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/realm/realm-swift.git";
-//    requirement = {
-//        kind = revision;
-//        revision = c989dbb92b3cf59b4f1ec1536b9dc090878ce4eb;
-//    };
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
-//    requirement = {
-//        branch = master;
-//        kind = branch;
-//    };
-
-//    isa = XCRemoteSwiftPackageReference;
-//    repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-//    requirement = {
-//        kind = upToNextMajorVersion;
-//        minimumVersion = 5.15.8;
-//    };
-
